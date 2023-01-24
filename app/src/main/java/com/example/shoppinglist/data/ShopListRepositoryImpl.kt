@@ -7,44 +7,50 @@ import com.example.shoppinglist.domain.ShopListRepository
 import java.util.Random
 import java.util.TreeSet
 
-object ShopListRepositoryImpl: ShopListRepository {
-    private val shopList = sortedSetOf<ShopItem>(
-        Comparator { t, t2 -> t.id.compareTo(t2.id) })
+object ShopListRepositoryImpl : ShopListRepository {
 
-    private val shopListLiveData = MutableLiveData<TreeSet<ShopItem>>()
+    private val shopListLD = MutableLiveData<List<ShopItem>>()
+    private val shopList = sortedSetOf<ShopItem>({ o1, o2 -> o1.id.compareTo(o2.id) })
 
-//    private var autoIncrement = 0;
+    private var autoIncrementId = 0
 
     init {
-        for (i in 0..1000){
-            addShopItem(ShopItem(i, "name $i", i, kotlin.random.Random.nextBoolean()))
-
+        for (i in 0 until 20) {
+            val item = ShopItem("Name $i", i, kotlin.random.Random.nextBoolean())
+            addShopItem(item)
         }
     }
 
     override fun addShopItem(shopItem: ShopItem) {
-//        shopItem.id = autoIncrement++
+        if (shopItem.id == ShopItem.UNDEFINED_ID) {
+            shopItem.id = autoIncrementId++
+        }
         shopList.add(shopItem)
-        shopListLiveData.value = shopList
+        updateList()
     }
 
     override fun deleteShopItem(shopItem: ShopItem) {
         shopList.remove(shopItem)
-        shopListLiveData.value = shopList
-    }
-
-    override fun getShopItem(shopItemId: Int): ShopItem {
-        return shopList.find { it.id == shopItemId } ?: throw Exception("not found")
-    }
-
-    override fun getShopList(): LiveData<TreeSet<ShopItem>> {
-        return shopListLiveData
+        updateList()
     }
 
     override fun updateShopItem(shopItem: ShopItem) {
-        val oldItem = getShopItem(shopItem.id)
-        shopList.remove(oldItem)
-        shopList.add(shopItem)
-        shopListLiveData.value = shopList
+        val oldElement = getShopItem(shopItem.id)
+        shopList.remove(oldElement)
+        addShopItem(shopItem)
+    }
+
+    override fun getShopItem(shopItemId: Int): ShopItem {
+        return shopList.find {
+            it.id == shopItemId
+        } ?: throw RuntimeException("Element with id $shopItemId not found")
+    }
+
+    override fun getShopList(): LiveData<List<ShopItem>> {
+        return shopListLD
+    }
+
+    private fun updateList() {
+        shopListLD.value = shopList.toList()
     }
 }

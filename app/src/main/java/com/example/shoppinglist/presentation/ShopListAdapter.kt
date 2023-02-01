@@ -28,8 +28,6 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
     var onShopItemClickListener: ((ShopItem) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
-//        println("${++count}")
-
         val layout = when (viewType) {
             VIEW_TYPE_DISABLED -> R.layout.shop_item_disabled
             VIEW_TYPE_ENABLED -> R.layout.shop_item_enabled
@@ -40,9 +38,7 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
     }
 
     override fun onBindViewHolder(viewHolder: ShopItemViewHolder, position: Int) {
-        Log.d("ShopListAdapter", "onBindViewHolder, count: ${++count}")
         val shopItem = getItem(position)
-        println(shopItem)
         viewHolder.view.setOnLongClickListener {
             onShopItemLongClickListener?.invoke(shopItem)
             true
@@ -58,11 +54,6 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        println(if (item.enable) {
-            VIEW_TYPE_ENABLED
-        } else {
-            VIEW_TYPE_DISABLED
-        })
         return if (item.enable) {
             VIEW_TYPE_ENABLED
         } else {
@@ -82,7 +73,7 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
         const val VIEW_TYPE_ENABLED = 100
         const val VIEW_TYPE_DISABLED = 101
 //
-//        const val MAX_POOL_SIZE = 30
+        const val MAX_POOL_SIZE = 30
     }
 
 }

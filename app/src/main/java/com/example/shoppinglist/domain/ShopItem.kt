@@ -1,5 +1,7 @@
 package com.example.shoppinglist.domain
 
+import androidx.lifecycle.LifecycleObserver
+
 data class ShopItem(
     val name: String,
     val count: Int,
@@ -12,3 +14,7 @@ data class ShopItem(
         const val UNDEFINED_ID = -1
     }
 }
+
+
+
+

@@ -1,21 +1,23 @@
 package com.example.shoppinglist.presentation.MainActivity
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.shoppinglist.data.ShopListRepositoryImpl
-import com.example.shoppinglist.domain.*
+import com.example.shoppinglist.domain.AddShopItemUseCase
+import com.example.shoppinglist.domain.DeleteShopItemUseCase
+import com.example.shoppinglist.domain.GetShopListUseCase
+import com.example.shoppinglist.domain.UpdateShopItemUseCase
+import com.example.shoppinglist.domain.ShopItem
 
 class MainViewModel: ViewModel() {
 
     private val repository = ShopListRepositoryImpl
-    private val addShopItemUseCase = AddShopItemUseCase(repository)
     private val deleteShopItemUseCase = DeleteShopItemUseCase(repository)
     private val getShopListUseCase = GetShopListUseCase(repository)
     private val updateShopItemUseCase = UpdateShopItemUseCase(repository)
 
     val shopList = getShopListUseCase.getShopList()
 
-    fun updateShopItem(shopItem: ShopItem){
+    fun updateShopItem(shopItem: ShopItem) {
         val newItem = shopItem.copy(enable = !shopItem.enable)
         updateShopItemUseCase.updateShopItem(newItem)
     }

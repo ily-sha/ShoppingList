@@ -1,7 +1,7 @@
 package com.example.shoppinglist.domain
 
 import androidx.lifecycle.LiveData
-import java.util.TreeSet
+import com.example.shoppinglist.domain.ShopItem
 
 interface ShopListRepository {
     fun addShopItem(shopItem: ShopItem)

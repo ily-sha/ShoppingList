@@ -1,28 +1,36 @@
 package com.example.shoppinglist.presentation
 
+import android.provider.ContactsContract.RawContacts.Data
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.example.shoppinglist.R
+import com.example.shoppinglist.databinding.ActivityMainBinding
+import com.example.shoppinglist.databinding.ShopItemDisabledBinding
+import com.example.shoppinglist.databinding.ShopItemEnabledBinding
 import com.example.shoppinglist.domain.ShopItem
 import com.example.shoppinglist.presentation.MainActivity.ShopItemDiffCallback
+import com.example.shoppinglist.presentation.MainActivity.ShopListDiffCallback
 
 class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder>(
     ShopItemDiffCallback()
 ){
-    var count = 0
 
-//    var shopList = listOf<ShopItem>()
-//        set(value) {
-//            val callback = ShopListDiffCallback(shopList, value)
-//            val diffResult = DiffUtil.calculateDiff(callback)
-//            diffResult.dispatchUpdatesTo(this)
-//            field = value
-//        }
+    var shopList = listOf<ShopItem>()
+        set(value) {
+            val callback = ShopListDiffCallback(shopList, value)
+            val diffResult = DiffUtil.calculateDiff(callback)
+            diffResult.dispatchUpdatesTo(this)
+            field = value
+        }
 
     var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
     var onShopItemClickListener: ((ShopItem) -> Unit)? = null
@@ -33,21 +41,35 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
             VIEW_TYPE_ENABLED -> R.layout.shop_item_enabled
             else -> throw RuntimeException("Unknown view type: $viewType")
         }
-        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
-        return ShopItemViewHolder(view)
+        val binding = DataBindingUtil.inflate<ViewDataBinding>(
+            LayoutInflater.from(parent.context),
+            layout,
+            parent,
+            false
+        )
+        return ShopItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(viewHolder: ShopItemViewHolder, position: Int) {
         val shopItem = getItem(position)
-        viewHolder.view.setOnLongClickListener {
+        viewHolder.binding.root.setOnLongClickListener {
             onShopItemLongClickListener?.invoke(shopItem)
             true
         }
-        viewHolder.view.setOnClickListener {
+        viewHolder.binding.root.setOnClickListener {
             onShopItemClickListener?.invoke(shopItem)
         }
-        viewHolder.tvName.text = shopItem.name
-        viewHolder.tvCount.text = shopItem.count.toString()
+        when (viewHolder.binding){
+            is ShopItemDisabledBinding -> {
+                viewHolder.binding.tvName.text = shopItem.name
+                viewHolder.binding.tvCount.text = shopItem.count.toString()
+            }
+            is ShopItemEnabledBinding -> {
+                viewHolder.binding.tvName.text = shopItem.name
+                viewHolder.binding.tvCount.text = shopItem.count.toString()
+            }
+        }
+
     }
 
 
@@ -62,10 +84,7 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
     }
 
 
-    class ShopItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val tvName = view.findViewById<TextView>(R.id.tvName)
-        val tvCount = view.findViewById<TextView>(R.id.tvCount)
-    }
+    class ShopItemViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
 
 
     companion object {

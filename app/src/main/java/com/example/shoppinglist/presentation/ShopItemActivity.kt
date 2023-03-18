@@ -1,47 +1,35 @@
-package com.example.shoppinglist.presentation.ShopItemActivity
+package com.example.shoppinglist.presentation
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
 import com.example.shoppinglist.R
 import com.example.shoppinglist.domain.ShopItem
-import com.example.shoppinglist.presentation.MainActivity.MainActivity
-import com.example.shoppinglist.presentation.ShopItemFragment
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingItemFinishListener {
 
     private var mode = INDEFINITE_MODE
     private var shopItemId = ShopItem.UNDEFINED_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        println(++MainActivity.count)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
         parseIntent()
-        launchFragment()
+        if (savedInstanceState == null) launchFragment()
     }
 
-    private fun launchFragment(){
+    private fun launchFragment() {
         val fragment = when (mode) {
             MODE_ADD -> ShopItemFragment.newInstanceAddItem()
             MODE_EDIT -> ShopItemFragment.newInstanceEditItem(shopItemId)
             else -> throw RuntimeException("Unknown screen mode $mode")
         }
-        supportFragmentManager.beginTransaction()
-            .add(R.id.shop_item_fragment_container, fragment)
+        supportFragmentManager.beginTransaction().add(R.id.shop_item_fragment_container, fragment)
             .commit()
     }
 
-    private fun parseIntent(){
+    private fun parseIntent() {
         if (!intent.hasExtra(EXTRA_SCREEN_MODE)) throw RuntimeException("Param extra screen mode is absent")
         mode = intent.getStringExtra(EXTRA_SCREEN_MODE).toString()
         if (mode != MODE_ADD && mode != MODE_EDIT) throw RuntimeException("Unknown screen mode $mode")
@@ -66,10 +54,16 @@ class ShopItemActivity : AppCompatActivity() {
 
         fun newIntentEdit(context: Context, shopItemId: Int): Intent {
             val intent = Intent(context, ShopItemActivity::class.java)
-            intent.putExtra(EXTRA_SCREEN_MODE, MODE_EDIT)
+            intent.putExtra(
+                EXTRA_SCREEN_MODE, MODE_EDIT
+            )
             intent.putExtra(EXTRA_SHOP_ITEM_ID, shopItemId)
             return intent
         }
+    }
+
+    override fun onEditingItemFinish() {
+        finish()
     }
 
 }

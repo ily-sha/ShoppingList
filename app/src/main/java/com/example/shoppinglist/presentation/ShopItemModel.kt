@@ -1,4 +1,4 @@
-package com.example.shoppinglist.presentation.ShopItemActivity
+package com.example.shoppinglist.presentation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -65,8 +65,6 @@ class ShopItemModel: ViewModel() {
         if (validateInput(name, count)){
             addShopItemUseCase.addShopItem(ShopItem(name, count, true))
             finishActivity()
-
-
         }
     }
 
@@ -86,7 +84,7 @@ class ShopItemModel: ViewModel() {
         }
     }
 
-    fun resetErrorInputName(){
+    fun resetErrorInputName() {
         _errorInputName.value = false
     }
 
